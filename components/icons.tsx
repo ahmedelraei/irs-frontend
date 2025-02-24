@@ -185,3 +185,22 @@ export const SearchIcon = (props: IconSvgProps) => (
     />
   </svg>
 );
+
+export const UserIcon = ({ className, size = 24 }: IconProps) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      strokeWidth={2} 
+      d="M5.121 17.804A4 4 0 016 16h12a4 4 0 01.879 1.804M12 12a4 4 0 100-8 4 4 0 000 8z" 
+    />
+  </svg>
+);
