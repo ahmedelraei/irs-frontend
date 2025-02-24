@@ -186,7 +186,7 @@ export const SearchIcon = (props: IconSvgProps) => (
   </svg>
 );
 
-export const UserIcon = ({ className, size = 24 }: IconProps) => (
+export const UserIcon = ({ className, size = 24 }: IconSvgProps) => (
   <svg
     className={className}
     width={size}
