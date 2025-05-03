@@ -1,9 +1,20 @@
 "use client";
 
 import React from "react";
-import { Form, Input, Button } from "@heroui/react";
+import { Form, Input, Button, Select, SelectItem } from "@heroui/react";
 
 import axiosClient from "@/lib/axiosClient";
+
+export const jobTitles = [
+  { key: "Backend Developer", label: "Backend Developer" },
+  { key: "Frontend Developer", label: "Frontend Developer" },
+  { key: "Flutter Developer", label: "Flutter Developer" },
+  { key: "Data Scientist", label: "Data Scientist" },
+  { key: "Machine Learning Engineer", label: "Machine Learning Engineer" },
+  { key: "AI Engineer", label: "AI Engineer" },
+  { key: "DevOps Engineer", label: "DevOps Engineer" },
+  { key: "Full Stack Developer", label: "Full Stack Developer" },
+];
 
 const RegisterPage = () => {
   const [formData, setFormData] = React.useState({
@@ -35,20 +46,20 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formElement = e.currentTarget;
-    const formData = new FormData(formElement);
+    // const formElement = e.currentTarget;
+    // const formData = new FormData(formElement);
 
-    const payload = {
-      email: formData.get("email"),
-      username: formData.get("username"),
-      firstName: formData.get("firstName"),
-      lastName: formData.get("lastName"),
-      jobTitle: formData.get("jobTitle"),
-      password: formData.get("password"),
-    };
+    // const payload = {
+    //   email: formData.get("email"),
+    //   username: formData.get("username"),
+    //   firstName: formData.get("firstName"),
+    //   lastName: formData.get("lastName"),
+    //   jobTitle: formData.get("jobTitle"),
+    //   password: formData.get("password"),
+    // };
 
     try {
-      await axiosClient.post("/users/", payload);
+      await axiosClient.post("/users/", formData);
 
       alert("Account created successfully!");
     } catch (error) {
@@ -101,16 +112,20 @@ const RegisterPage = () => {
           value={formData.lastName}
           onChange={handleInputChange}
         />
-        <Input
-          isRequired
-          errorMessage="Please enter a valid job title"
-          label="Job Title"
+        <Select
+          className="max-w-xs"
+          label="Job title"
           labelPlacement="outside"
-          name="jobTitle"
-          type="text"
+          placeholder="Select a job title"
           value={formData.jobTitle}
-          onChange={handleInputChange}
-        />
+          onChange={(e) =>
+            setFormData({ ...formData, jobTitle: e.target.value })
+          }
+        >
+          {jobTitles.map((jobTitle) => (
+            <SelectItem key={jobTitle.key}>{jobTitle.label}</SelectItem>
+          ))}
+        </Select>
         <Input
           isRequired
           label="Password"
