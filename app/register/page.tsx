@@ -5,7 +5,7 @@ import { Form, Input, Button, Select, SelectItem } from "@heroui/react";
 
 import axiosClient from "@/lib/axiosClient";
 
-export const jobTitles = [
+const jobTitles = [
   { key: "Backend Developer", label: "Backend Developer" },
   { key: "Frontend Developer", label: "Frontend Developer" },
   { key: "Flutter Developer", label: "Flutter Developer" },
