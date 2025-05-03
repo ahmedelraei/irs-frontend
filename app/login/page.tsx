@@ -28,6 +28,7 @@ export default function LoginPage() {
       // Save response data temporarily
       const { accessToken, refreshToken } = response.data;
 
+      console.log("Login response:", response.data);
       // Use a custom event to handle storage in useEffect
       window.dispatchEvent(
         new CustomEvent("login-success", {
@@ -43,6 +44,14 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+      router.push("/");
+    }
+  }, [router]);
 
   // Handle localStorage in useEffect
   useEffect(() => {

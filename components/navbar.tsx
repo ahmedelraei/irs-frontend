@@ -34,7 +34,22 @@ export const Navbar = () => {
 
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
   const router = useRouter();
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (token) {
+      console.log("Token exists");
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  console.log("isAuthenticated", isAuthenticated);
 
   return (
     <>
@@ -61,7 +76,7 @@ export const Navbar = () => {
                 <NextLink
                   className={clsx(
                     linkStyles({ color: "foreground" }),
-                    "data-[active=true]:text-primary data-[active=true]:font-medium"
+                    "data-[active=true]:text-primary data-[active=true]:font-medium",
                   )}
                   color="foreground"
                   href={item.href}
@@ -96,14 +111,25 @@ export const Navbar = () => {
               <GithubIcon className="text-default-500" />
             </Link>
             <ThemeSwitch />
-            <Button
-              className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
-              startContent={<UserIcon className="text-danger" />}
-              variant="flat"
-              onPress={() => router.push("/login")}
-            >
-              Login
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
+                startContent={<UserIcon className="text-danger" />}
+                variant="flat"
+                onPress={() => router.push("/profile")}
+              >
+                Profile
+              </Button>
+            ) : (
+              <Button
+                className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
+                startContent={<UserIcon className="text-danger" />}
+                variant="flat"
+                onPress={() => router.push("/login")}
+              >
+                Login
+              </Button>
+            )}
           </NavbarItem>
         </NavbarContent>
 
@@ -112,14 +138,26 @@ export const Navbar = () => {
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
-          <Button
-            className="text-sm font-normal text-default-600 bg-default-100 inline-flex min-w-[120px] px-4"
-            startContent={<UserIcon className="text-danger" />}
-            variant="flat"
-            onPress={() => router.push("/login")}
-          >
-            Login
-          </Button>
+          {isAuthenticated ? (
+            <Button
+              className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
+              startContent={<UserIcon className="text-danger" />}
+              variant="flat"
+              onPress={() => router.push("/profile")}
+            >
+              Profile
+            </Button>
+          ) : (
+            <Button
+              className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
+              startContent={<UserIcon className="text-danger" />}
+              variant="flat"
+              onPress={() => router.push("/login")}
+            >
+              Login
+            </Button>
+          )}
+
           <NavbarMenuToggle />
         </NavbarContent>
 

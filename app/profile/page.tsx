@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Form, Input, Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 import axiosClient from "@/lib/axiosClient";
 
@@ -13,6 +14,7 @@ const ProfilePage = () => {
     lastName: "",
     resume: null,
   });
+  const router = useRouter();
 
   // Add a change handler function
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +34,7 @@ const ProfilePage = () => {
   };
 
   React.useEffect(() => {
+    if (!localStorage.getItem("access_token")) return router.push("/login");
     const fetchProfileData = async () => {
       try {
         const response = await axiosClient("/users/me");
