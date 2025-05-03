@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("");
@@ -90,7 +91,14 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <Button className="w-full" disabled={loading} type="submit">
-          {loading ? "Logging in..." : "Login"}
+          {loading ? (
+            <div className="flex items-center justify-center gap-2">
+              <LoadingSpinner color="secondary" size="sm" />
+              <span>Logging in...</span>
+            </div>
+          ) : (
+            "Login"
+          )}
         </Button>
       </form>
     </div>

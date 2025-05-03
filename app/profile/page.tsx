@@ -5,6 +5,7 @@ import { Form, Input, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import axiosClient from "@/lib/axiosClient";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const ProfilePage = () => {
   const [formData, setFormData] = React.useState({
@@ -14,6 +15,8 @@ const ProfilePage = () => {
     lastName: "",
     resume: null,
   });
+  const [loading, setLoading] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
   const router = useRouter();
 
   // Add a change handler function
@@ -37,6 +40,7 @@ const ProfilePage = () => {
     if (!localStorage.getItem("access_token")) return router.push("/login");
     const fetchProfileData = async () => {
       try {
+        setLoading(true);
         const response = await axiosClient("/users/me");
 
         const data = response.data;
@@ -55,6 +59,8 @@ const ProfilePage = () => {
         console.log("API response data:", data);
       } catch (error) {
         console.error("Error fetching profile data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -74,6 +80,7 @@ const ProfilePage = () => {
     }
 
     try {
+      setSubmitting(true);
       const response = await axiosClient.patch("/users/me/", formData);
 
       console.log("Profile updated successfully:", response.data);
@@ -84,70 +91,86 @@ const ProfilePage = () => {
       console.error("Error updating profile:", error);
       // Optional: Show error message to user
       alert("Failed to update profile. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div>
-      <Form
-        className="w-full max-w-xs flex flex-col gap-4"
-        onSubmit={handleSubmit}
-      >
-        <Input
-          isRequired
-          errorMessage="Please enter a valid email"
-          label="Email"
-          labelPlacement="outside"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleInputChange}
-        />
-        <Input
-          isRequired
-          errorMessage="Please enter a valid username"
-          label="Username"
-          labelPlacement="outside"
-          name="username"
-          type="text"
-          value={formData.username}
-          onChange={handleInputChange}
-        />
-        <Input
-          isRequired
-          errorMessage="Please enter a valid first name"
-          label="First Name"
-          labelPlacement="outside"
-          name="firstName"
-          type="text"
-          value={formData.firstName}
-          onChange={handleInputChange}
-        />
-        <Input
-          isRequired
-          errorMessage="Please enter a valid last name"
-          label="Last Name"
-          labelPlacement="outside"
-          name="lastName"
-          type="text"
-          value={formData.lastName}
-          onChange={handleInputChange}
-        />
-        <Input
-          isRequired
-          accept="pdf"
-          label="Resume / CV"
-          labelPlacement="outside"
-          name="resumeFile"
-          type="file"
-          onChange={handleInputChange}
-        />
-        <div className="flex gap-2">
-          <Button color="primary" type="submit">
-            Update Profile
-          </Button>
+    <div className="w-full min-h-[60vh] flex justify-center">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-[40vh]">
+          <LoadingSpinner color="primary" size="lg" />
+          <p className="mt-4 text-gray-500">Loading your profile...</p>
         </div>
-      </Form>
+      ) : (
+        <Form
+          className="w-full max-w-xs flex flex-col gap-4"
+          onSubmit={handleSubmit}
+        >
+          <Input
+            isRequired
+            errorMessage="Please enter a valid email"
+            label="Email"
+            labelPlacement="outside"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleInputChange}
+          />
+          <Input
+            isRequired
+            errorMessage="Please enter a valid username"
+            label="Username"
+            labelPlacement="outside"
+            name="username"
+            type="text"
+            value={formData.username}
+            onChange={handleInputChange}
+          />
+          <Input
+            isRequired
+            errorMessage="Please enter a valid first name"
+            label="First Name"
+            labelPlacement="outside"
+            name="firstName"
+            type="text"
+            value={formData.firstName}
+            onChange={handleInputChange}
+          />
+          <Input
+            isRequired
+            errorMessage="Please enter a valid last name"
+            label="Last Name"
+            labelPlacement="outside"
+            name="lastName"
+            type="text"
+            value={formData.lastName}
+            onChange={handleInputChange}
+          />
+          <Input
+            isRequired
+            accept="pdf"
+            label="Resume / CV"
+            labelPlacement="outside"
+            name="resumeFile"
+            type="file"
+            onChange={handleInputChange}
+          />
+          <div className="flex gap-2">
+            <Button color="primary" disabled={submitting} type="submit">
+              {submitting ? (
+                <div className="flex items-center gap-2">
+                  <LoadingSpinner color="secondary" size="sm" />
+                  <span>Updating...</span>
+                </div>
+              ) : (
+                "Update Profile"
+              )}
+            </Button>
+          </div>
+        </Form>
+      )}
     </div>
   );
 };

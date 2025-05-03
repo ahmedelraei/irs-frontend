@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import axiosClient from "@/lib/axiosClient";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface JobCardProps {
   title: string;
@@ -37,7 +38,7 @@ const JobCard = ({ title, company, location, description }: JobCardProps) => {
         <div className="flex flex-col">
           <p className="text-md">{title}</p>
           <p className="text-small text-default-500">
-            {company}, {location}
+            {company ?? "Unknown Inc"}, {location ?? "Cairo, Egypt"}
           </p>
         </div>
       </CardHeader>
@@ -62,6 +63,8 @@ const JobCard = ({ title, company, location, description }: JobCardProps) => {
 const JobSearchPage = () => {
   const [internships, setInternships] = useState<JobCardProps[]>([]);
   const [visibleCount, setVisibleCount] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -74,63 +77,29 @@ const JobSearchPage = () => {
     }
   }, []);
 
-  //     const jobDescription = `We’re looking for a Junior Web Scraping Developer to join our client’s team. If you’re a curious, detail-oriented developer with a passion for working with web technologies and data, this role will allow you to build, maintain, and optimize web scraping scripts that extract valuable insights for the business. You’ll gain exposure to large-scale data extraction techniques while working closely with experienced engineers to refine and improve scraping methodologies.
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        !loading &&
+        hasMore &&
+        window.innerHeight + document.documentElement.scrollTop + 50 >=
+          document.documentElement.offsetHeight
+      ) {
+        setVisibleCount((prev) => Math.min(internships.length, prev + 5));
 
-  // Key Responsibilities
+        if (visibleCount + 5 >= internships.length) {
+          fetchMoreInternships();
+        }
+      }
+    };
 
-  // Web Scraping Development – Build and maintain web scrapers using React, Java, or .NET to extract structured data from web sources.
-  // Data Extraction & Processing – Work with APIs and web page parsing techniques to collect and clean large datasets.
-  // Front-End Parsing – Identify and extract relevant data from web pages by analyzing HTML, JavaScript, and structured elements.
-  // Bug Fixing & Optimization – Debug and refine scraping scripts to improve efficiency, reliability, and data accuracy.
-  // Performance & Compliance – Ensure scrapers operate efficiently while minimizing risks such as IP blocking and CAPTCHA detection.
-  // Collaboration & Learning – Work alongside senior engineers to enhance scraping methodologies and develop best practices.
+    window.addEventListener("scroll", handleScroll);
 
-  // Minimum Qualifications
-
-  // Programming Experience – Proficiency in React, Java, or .NET, with a focus on front-end or back-end web development.
-  // Basic Web Scraping Knowledge – Familiarity with libraries and frameworks such as Puppeteer, BeautifulSoup, Scrapy, or Selenium.
-  // API Integration – Experience working with REST APIs, handling JSON/XML data formats, and making HTTP requests.
-  // Problem-Solving Mindset – Ability to analyze data extraction challenges and propose technical solutions.
-  // English Communication – Strong written and verbal communication skills to collaborate effectively within a remote team.
-
-  // Company Benefits
-
-  // Top-of-the-market pay.
-  // Remote working.
-  // Potential for flexible hours.
-  // Becoming a part of Palm Outsourcing, where your performance is rewarded in long-term job security and continued growth opportunities.`;
-
-  //     // Generate 50 dummy internships all with the same detailed description
-  //     const dummyInternships: JobCardProps[] = Array.from({ length: 50 }, () => ({
-  //       title: "Junior Web Scraping Developer",
-  //       company: "Palm Outsourcing",
-  //       location: "Remote",
-  //       description: jobDescription,
-  //     }));
-  //     // Simulate fetching data with a delay
-  //     const timer = setTimeout(() => {
-  //       setInternships(dummyInternships);
-  //     }, 500);
-
-  //     return () => clearTimeout(timer);
-  //   }, []);
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (
-  //       window.innerHeight + document.documentElement.scrollTop + 50 >=
-  //       document.documentElement.offsetHeight
-  //     ) {
-  //       setVisibleCount((prev) => Math.min(internships.length, prev + 5));
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [internships.length]);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [internships.length, visibleCount, loading, hasMore]);
 
   const fetchInternships = async () => {
+    setLoading(true);
     const token = localStorage.getItem("access_token");
 
     try {
@@ -138,8 +107,36 @@ const JobSearchPage = () => {
 
       console.log(r.data);
       setInternships(r.data);
+      setHasMore(r.data.length > visibleCount);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMoreInternships = async () => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+    try {
+      const r = await axiosClient.get(
+        `/jobs/recommended?offset=${internships.length}`,
+      );
+      const newInternships = r.data;
+
+      if (newInternships.length === 0) {
+        setHasMore(false);
+      } else {
+        setInternships((prevInternships) => [
+          ...prevInternships,
+          ...newInternships,
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching more internships:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -150,11 +147,41 @@ const JobSearchPage = () => {
   return (
     <div className="w-full min-h-screen p-6">
       <h1 className="text-4xl font-bold mb-6">Based on your profile...</h1>
-      <div className="w-full flex flex-col gap-4">
-        {internships.slice(0, visibleCount).map((job, index) => (
-          <JobCard key={index} {...job} />
-        ))}
-      </div>
+
+      {/* Initial loading state */}
+      {loading && internships.length === 0 ? (
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <LoadingSpinner color="primary" size="lg" />
+        </div>
+      ) : (
+        <div className="w-full flex flex-col gap-4">
+          {internships.slice(0, visibleCount).map((job, index) => (
+            <JobCard key={index} {...job} />
+          ))}
+
+          {/* Loading more internships */}
+          {loading && internships.length > 0 && (
+            <div className="py-4">
+              <LoadingSpinner color="primary" size="md" />
+            </div>
+          )}
+
+          {/* End of results message */}
+          {!hasMore && internships.length > 0 && (
+            <div className="text-center py-4 text-gray-500">
+              No more internships to load
+            </div>
+          )}
+
+          {/* No results message */}
+          {!loading && internships.length === 0 && (
+            <div className="text-center py-4 text-gray-500">
+              No internships found. Please update your profile to get more
+              relevant recommendations.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
