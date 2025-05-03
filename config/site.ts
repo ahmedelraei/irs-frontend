@@ -11,28 +11,38 @@ export const siteConfig = {
     {
       label: "Internships",
       href: "/internships",
-    }
+    },
   ],
   navMenuItems: [
     {
+      label: "Home",
+      href: "/",
+      requiresAuth: false,
+    },
+    {
+      label: "Login",
+      href: "/login",
+      notAuthOnly: true,
+    },
+    {
+      label: "Register",
+      href: "/register",
+      notAuthOnly: true,
+    },
+    {
       label: "Profile",
       href: "/profile",
+      requiresAuth: true,
     },
     {
       label: "Internships",
       href: "/internships",
-    },
-    {
-      label: "Settings",
-      href: "/settings",
-    },
-    {
-      label: "Help & Feedback",
-      href: "/help-feedback",
+      requiresAuth: true,
     },
     {
       label: "Logout",
       href: "/logout",
+      requiresAuth: true,
     },
   ],
   links: {

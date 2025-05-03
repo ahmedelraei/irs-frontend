@@ -9,7 +9,13 @@ import {
   NavbarItem,
   NavbarMenuItem,
 } from "@heroui/navbar";
-import { useDisclosure } from "@heroui/react";
+import {
+  useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
 import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { link as linkStyles } from "@heroui/theme";
@@ -19,6 +25,7 @@ import { useRouter } from "next/navigation";
 
 import LoginModal from "./LoginModal";
 
+import { authEvents } from "@/lib/authEvents";
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -31,25 +38,45 @@ import {
 
 export const Navbar = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-
   const router = useRouter();
 
+  // Check authentication on initial load
   React.useEffect(() => {
     const token = localStorage.getItem("access_token");
 
-    if (token) {
-      console.log("Token exists");
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    setIsAuthenticated(!!token);
   }, []);
 
-  console.log("isAuthenticated", isAuthenticated);
+  // Listen for authentication events
+  React.useEffect(() => {
+    // Handle login events
+    const unsubscribeLogin = authEvents.onLogin(() => {
+      console.log("Login event detected");
+      setIsAuthenticated(true);
+    });
+
+    // Handle logout events
+    const unsubscribeLogout = authEvents.onLogout(() => {
+      console.log("Logout event detected");
+      setIsAuthenticated(false);
+    });
+
+    // Clean up event listeners
+    return () => {
+      unsubscribeLogin();
+      unsubscribeLogout();
+    };
+  }, []);
+
+  // Handle logout action
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    authEvents.emitLogout();
+    router.push("/");
+  };
 
   return (
     <>
@@ -112,14 +139,38 @@ export const Navbar = () => {
             </Link>
             <ThemeSwitch />
             {isAuthenticated ? (
-              <Button
-                className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
-                startContent={<UserIcon className="text-danger" />}
-                variant="flat"
-                onPress={() => router.push("/profile")}
-              >
-                Profile
-              </Button>
+              // <Button
+              //   className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
+              //   startContent={<UserIcon className="text-danger" />}
+              //   variant="flat"
+              //   onPress={() => router.push("/profile")}
+              // >
+              //   Profile
+              // </Button>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button variant="bordered">Profile</Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Static Actions">
+                  <DropdownItem
+                    key="profile"
+                    onPress={() => router.push("/profile")}
+                  >
+                    Edit My Profile
+                  </DropdownItem>
+                  <DropdownItem
+                    key="delete"
+                    className="text-danger"
+                    color="danger"
+                    onPress={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    Logout
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             ) : (
               <Button
                 className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
@@ -138,16 +189,7 @@ export const Navbar = () => {
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
-          {isAuthenticated ? (
-            <Button
-              className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
-              startContent={<UserIcon className="text-danger" />}
-              variant="flat"
-              onPress={() => router.push("/profile")}
-            >
-              Profile
-            </Button>
-          ) : (
+          {!isAuthenticated && (
             <Button
               className="text-sm font-normal text-default-600 bg-default-100 inline-flex items-center min-w-[120px] px-4"
               startContent={<UserIcon className="text-danger" />}
@@ -157,34 +199,54 @@ export const Navbar = () => {
               Login
             </Button>
           )}
-
           <NavbarMenuToggle />
         </NavbarContent>
 
         {isMenuOpen && (
           <NavbarMenu>
             <div className="mx-4 mt-2 flex flex-col gap-2">
-              {siteConfig.navMenuItems.map((item, index) => (
-                <NavbarMenuItem key={`${item}-${index}`}>
-                  <Link
-                    color={
-                      index === 2
-                        ? "primary"
-                        : index === siteConfig.navMenuItems.length - 1
-                          ? "danger"
-                          : "foreground"
-                    }
-                    href={item.href}
-                    size="lg"
-                    onPress={() => {
-                      setIsMenuOpen(false);
-                      router.push(item.href);
-                    }}
-                  >
-                    {item.label}
-                  </Link>
-                </NavbarMenuItem>
-              ))}
+              {siteConfig.navMenuItems.map((item, index) => {
+                if (item.requiresAuth && !isAuthenticated) return null;
+                else if (isAuthenticated && item.notAuthOnly) return null;
+
+                if (item.href === "/logout")
+                  return (
+                    <NavbarMenuItem key={`${item}-${index}`}>
+                      <Link
+                        color="danger"
+                        size="lg"
+                        onPress={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        {item.label}
+                      </Link>
+                    </NavbarMenuItem>
+                  );
+
+                return (
+                  <NavbarMenuItem key={`${item}-${index}`}>
+                    <Link
+                      color={
+                        index === 2
+                          ? "primary"
+                          : index === siteConfig.navMenuItems.length - 1
+                            ? "danger"
+                            : "foreground"
+                      }
+                      href={item.href}
+                      size="lg"
+                      onPress={() => {
+                        setIsMenuOpen(false);
+                        router.push(item.href);
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  </NavbarMenuItem>
+                );
+              })}
             </div>
           </NavbarMenu>
         )}

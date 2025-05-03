@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { authEvents } from "@/lib/authEvents";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("");
@@ -62,6 +63,9 @@ export default function LoginPage() {
       // Store in localStorage for API requests
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
+
+      // Emit login event for the navbar to detect
+      authEvents.emitLogin();
     };
 
     window.addEventListener("login-success", handleLoginSuccess);

@@ -1,7 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Modal, Button, Input } from "@heroui/react";
+
 import axiosClient from "@/lib/axiosClient";
+import { authEvents } from "@/lib/authEvents";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -19,9 +22,17 @@ const LoginModal = ({ isOpen, onOpenChange }: LoginModalProps) => {
     setLoading(true);
     setError("");
     try {
-      const response = await axiosClient.post("/auth/login", { email, password });
+      const response = await axiosClient.post("/users/login", {
+        email,
+        password,
+      });
+
       localStorage.setItem("access_token", response.data.accessToken);
       localStorage.setItem("refresh_token", response.data.refreshToken);
+
+      // Emit login event to update navbar
+      authEvents.emitLogin();
+
       onOpenChange(false);
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
@@ -41,29 +52,36 @@ const LoginModal = ({ isOpen, onOpenChange }: LoginModalProps) => {
         {error && <p className="text-danger mb-2">{error}</p>}
         <form onSubmit={handleSubmit}>
           <Input
+            required
+            className="mb-4"
             label="Email"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            required
-            className="mb-4"
           />
           <Input
-            label="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
             required
             className="mb-4"
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Logging in..." : "Login"}
+          <Button className="w-full" disabled={loading} type="submit">
+            {loading ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner color="secondary" size="sm" />
+                <span>Logging in...</span>
+              </div>
+            ) : (
+              "Login"
+            )}
           </Button>
         </form>
         <Button
+          className="mt-4 w-full"
           variant="ghost"
           onPress={() => onOpenChange(false)}
-          className="mt-4 w-full"
         >
           Cancel
         </Button>
