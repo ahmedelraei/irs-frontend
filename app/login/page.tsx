@@ -3,6 +3,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Link } from "@heroui/link";
 
 import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";
@@ -104,6 +105,13 @@ export default function LoginPage() {
             "Login"
           )}
         </Button>
+        <Link className="mt-4 block text-center" href="/register">
+          Don't have an account? Register
+        </Link>
+        {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
+        <Link className="mt-4 block text-center" href="/forgot-password">
+          Forgot Password?
+        </Link>
       </form>
     </div>
   );
