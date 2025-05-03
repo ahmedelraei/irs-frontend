@@ -106,7 +106,7 @@ export default function LoginPage() {
           )}
         </Button>
         <Link className="mt-4 block text-center" href="/register">
-          Don't have an account? Register
+          Don&apos;t have an account? Register
         </Link>
         {error && <div className="mt-4 text-red-500 text-center">{error}</div>}
         <Link className="mt-4 block text-center" href="/forgot-password">
