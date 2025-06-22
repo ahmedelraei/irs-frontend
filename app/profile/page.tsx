@@ -4,6 +4,7 @@ import React from "react";
 import { Form, Input, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
+import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
@@ -97,79 +98,92 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="w-full min-h-[60vh] flex justify-center">
+    <div>
+      <h2 className={title()}>My Profile..</h2>
       {loading ? (
         <div className="flex flex-col items-center justify-center h-[40vh]">
           <LoadingSpinner color="primary" size="lg" />
           <p className="mt-4 text-gray-500">Loading your profile...</p>
         </div>
       ) : (
-        <Form
-          className="w-full max-w-xs flex flex-col gap-4"
-          onSubmit={handleSubmit}
-        >
-          <Input
-            isRequired
-            errorMessage="Please enter a valid email"
-            label="Email"
-            labelPlacement="outside"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-          <Input
-            isRequired
-            errorMessage="Please enter a valid username"
-            label="Username"
-            labelPlacement="outside"
-            name="username"
-            type="text"
-            value={formData.username}
-            onChange={handleInputChange}
-          />
-          <Input
-            isRequired
-            errorMessage="Please enter a valid first name"
-            label="First Name"
-            labelPlacement="outside"
-            name="firstName"
-            type="text"
-            value={formData.firstName}
-            onChange={handleInputChange}
-          />
-          <Input
-            isRequired
-            errorMessage="Please enter a valid last name"
-            label="Last Name"
-            labelPlacement="outside"
-            name="lastName"
-            type="text"
-            value={formData.lastName}
-            onChange={handleInputChange}
-          />
-          <Input
-            isRequired
-            accept="pdf"
-            label="Resume / CV"
-            labelPlacement="outside"
-            name="resumeFile"
-            type="file"
-            onChange={handleInputChange}
-          />
-          <div className="flex gap-2">
-            <Button color="primary" disabled={submitting} type="submit">
-              {submitting ? (
-                <div className="flex items-center gap-2">
-                  <LoadingSpinner color="secondary" size="sm" />
-                  <span>Updating...</span>
-                </div>
-              ) : (
-                "Update Profile"
-              )}
-            </Button>
-          </div>
-        </Form>
+        <>
+          <Form
+            className="w-full max-w-3xl flex flex-col gap-4 mt-5"
+            onSubmit={handleSubmit}
+          >
+            <Input
+              isRequired
+              errorMessage="Please enter a valid email"
+              fullWidth={true}
+              label="Email"
+              labelPlacement="outside"
+              name="email"
+              size="lg"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
+            <Input
+              isRequired
+              errorMessage="Please enter a valid username"
+              fullWidth={true}
+              label="Username"
+              labelPlacement="outside"
+              name="username"
+              size="lg"
+              type="text"
+              value={formData.username}
+              onChange={handleInputChange}
+            />
+            <Input
+              isRequired
+              errorMessage="Please enter a valid first name"
+              fullWidth={true}
+              label="First Name"
+              labelPlacement="outside"
+              name="firstName"
+              size="lg"
+              type="text"
+              value={formData.firstName}
+              onChange={handleInputChange}
+            />
+            <Input
+              isRequired
+              errorMessage="Please enter a valid last name"
+              fullWidth={true}
+              label="Last Name"
+              labelPlacement="outside"
+              name="lastName"
+              size="lg"
+              type="text"
+              value={formData.lastName}
+              onChange={handleInputChange}
+            />
+            <Input
+              isRequired
+              accept="pdf"
+              fullWidth={true}
+              label="Resume / CV"
+              labelPlacement="outside"
+              name="resumeFile"
+              size="lg"
+              type="file"
+              onChange={handleInputChange}
+            />
+            <div className="flex gap-2">
+              <Button color="primary" disabled={submitting} type="submit">
+                {submitting ? (
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner color="secondary" size="sm" />
+                    <span>Updating...</span>
+                  </div>
+                ) : (
+                  "Update Profile"
+                )}
+              </Button>
+            </div>
+          </Form>
+        </>
       )}
     </div>
   );

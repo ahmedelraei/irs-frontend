@@ -78,10 +78,11 @@ export default function LoginPage() {
   return (
     <div>
       <h1 className={title()}>Login</h1>
-      <form onSubmit={handleSubmit}>
+      <form className="mt-5 w-full" onSubmit={handleSubmit}>
         <Input
           required
           className="mb-4"
+          fullWidth={true}
           label="Email"
           type="email"
           value={email}
@@ -90,12 +91,18 @@ export default function LoginPage() {
         <Input
           required
           className="mb-4"
+          fullWidth={true}
           label="Password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button className="w-full" disabled={loading} type="submit">
+        <Button
+          className="w-full"
+          color="primary"
+          disabled={loading}
+          type="submit"
+        >
           {loading ? (
             <div className="flex items-center justify-center gap-2">
               <LoadingSpinner color="secondary" size="sm" />

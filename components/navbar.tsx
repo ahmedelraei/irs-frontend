@@ -75,7 +75,7 @@ export const Navbar = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     authEvents.emitLogout();
-    router.push("/");
+    window.location.href = "/";
   };
 
   return (

@@ -3,6 +3,7 @@
 import React from "react";
 import { Form, Input, Button, Select, SelectItem } from "@heroui/react";
 
+import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";
 
 const jobTitles = [
@@ -71,13 +72,16 @@ const RegisterPage = () => {
 
   return (
     <div>
+      <h1 className={title()}>Create An Account..</h1>
       <Form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
         <Input
           isRequired
           errorMessage="Please enter a valid email"
+          fullWidth={true}
           label="Email"
           labelPlacement="outside"
           name="email"
+          size="lg"
           type="email"
           value={formData.email}
           onChange={handleInputChange}
@@ -85,9 +89,11 @@ const RegisterPage = () => {
         <Input
           isRequired
           errorMessage="Please enter a valid username"
+          fullWidth={true}
           label="Username"
           labelPlacement="outside"
           name="username"
+          size="lg"
           type="text"
           value={formData.username}
           onChange={handleInputChange}
@@ -95,9 +101,11 @@ const RegisterPage = () => {
         <Input
           isRequired
           errorMessage="Please enter a valid first name"
+          fullWidth={true}
           label="First Name"
           labelPlacement="outside"
           name="firstName"
+          size="lg"
           type="text"
           value={formData.firstName}
           onChange={handleInputChange}
@@ -105,18 +113,22 @@ const RegisterPage = () => {
         <Input
           isRequired
           errorMessage="Please enter a valid last name"
+          fullWidth={true}
           label="Last Name"
           labelPlacement="outside"
           name="lastName"
+          size="lg"
           type="text"
           value={formData.lastName}
           onChange={handleInputChange}
         />
         <Select
           className="max-w-xs"
+          fullWidth={true}
           label="Job title"
           labelPlacement="outside"
           placeholder="Select a job title"
+          size="lg"
           value={formData.jobTitle}
           onChange={(e) =>
             setFormData({ ...formData, jobTitle: e.target.value })
@@ -128,18 +140,18 @@ const RegisterPage = () => {
         </Select>
         <Input
           isRequired
+          fullWidth={true}
           label="Password"
           labelPlacement="outside"
           name="password"
+          size="lg"
           type="password"
           value={formData.password}
           onChange={handleInputChange}
         />
-        <div className="flex gap-2">
-          <Button color="primary" type="submit">
-            Sign Up
-          </Button>
-        </div>
+        <Button className="w-full" color="primary" type="submit">
+          Sign Up
+        </Button>
       </Form>
     </div>
   );
