@@ -8,7 +8,7 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
-} from "@heroui/navbar";
+} from "@heroui/react";
 import {
   useDisclosure,
   Dropdown,
