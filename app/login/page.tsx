@@ -1,9 +1,9 @@
 "use client";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
+import { Button } from "@heroui/react";
+import { Input } from "@heroui/react";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Link } from "@heroui/link";
+import { Link } from "@heroui/react";
 
 import { title } from "@/components/primitives";
 import axiosClient from "@/lib/axiosClient";

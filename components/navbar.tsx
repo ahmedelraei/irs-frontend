@@ -16,8 +16,8 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { Button } from "@heroui/button";
-import { Link } from "@heroui/link";
+import { Button } from "@heroui/react";
+import { Link } from "@heroui/react";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
